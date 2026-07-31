@@ -1,0 +1,42 @@
+import { useEffect, useState } from "react";
+import Timeline from "../components/Timeline";
+
+const Itinerary = () => {
+  const [trip, setTrip] = useState(null);
+
+  useEffect(() => {
+    const storedTrip = localStorage.getItem("tripResult");
+
+    if (storedTrip) {
+      setTrip(JSON.parse(storedTrip));
+    }
+  }, []);
+
+  if (!trip) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        Loading itinerary...
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="max-w-7xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-2">
+          🗓️ Day-wise Itinerary
+        </h1>
+
+        <p className="text-gray-400 mb-8">
+          Your complete travel schedule.
+        </p>
+
+        <Timeline itinerary={trip.itinerary} />
+
+      </div>
+    </div>
+  );
+};
+
+export default Itinerary;

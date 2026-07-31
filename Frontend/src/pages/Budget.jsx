@@ -1,0 +1,42 @@
+import { useEffect, useState } from "react";
+import BudgetCard from "../components/BudgetCard";
+
+const Budget = () => {
+  const [trip, setTrip] = useState(null);
+
+  useEffect(() => {
+    const storedTrip = localStorage.getItem("tripResult");
+
+    if (storedTrip) {
+      setTrip(JSON.parse(storedTrip));
+    }
+  }, []);
+
+  if (!trip) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        Loading budget...
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="max-w-7xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-2">
+          💰 Budget Planner
+        </h1>
+
+        <p className="text-gray-400 mb-8">
+          Estimated travel expenses for your trip.
+        </p>
+
+        <BudgetCard budget={trip.budget} />
+
+      </div>
+    </div>
+  );
+};
+
+export default Budget;

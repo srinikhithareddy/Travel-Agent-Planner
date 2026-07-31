@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 
-import TripHeader from "../components/TripHeader";
+import QuickActions from "../components/QuickActions";
 import WeatherCard from "../components/WeatherCard";
 import HotelCard from "../components/HotelCard";
 import Timeline from "../components/Timeline";
@@ -10,6 +10,16 @@ import AttractionsGrid from "../components/AttractionsGrid";
 import RestaurantsGrid from "../components/RestaurantsGrid";
 import BudgetCard from "../components/BudgetCard";
 import TravelTips from "../components/TravelTips";
+
+import HeroBanner from "../components/HeroBanner";
+import SummaryCards from "../components/SummaryCards";
+import TravelScore from "../components/TravelScore";
+import AIInsights from "../components/AIInsights";
+import PackingList from "../components/PackingList";
+import EmergencyCard from "../components/EmergencyCard";
+import LocalFood from "../components/LocalFood";
+import DailyWeather from "../components/DailyWeather";
+import HiddenGems from "../components/HiddenGems";
 
 const Result = () => {
   const navigate = useNavigate();
@@ -74,31 +84,23 @@ const Result = () => {
 
         </div>
 
-        <TripHeader
-          destination={trip.destination}
-          summary={trip.summary}
-          startDate={trip.start_date}
-          endDate={trip.end_date}
-          travelers={trip.travelers}
-          budget={trip.total_budget}
-        />
+          <HeroBanner trip={trip} />
+
+        <SummaryCards trip={trip} />
 
         <WeatherCard weather={trip.weather} />
 
-        <HotelCard hotel={trip.hotel} />
+        <QuickActions />
 
-        <Timeline itinerary={trip.itinerary} />
+        <TravelScore score={trip.travel_score} />
 
-        <AttractionsGrid attractions={trip.attractions} />
-
-        <RestaurantsGrid restaurants={trip.restaurants} />
+        <AIInsights insights={trip.ai_insights} />
 
         <BudgetCard budget={trip.budget} />
 
         <TravelTips tips={trip.tips} />
-
-      </div>
-    </div>
+              </div>
+            </div>
   );
 };
 
