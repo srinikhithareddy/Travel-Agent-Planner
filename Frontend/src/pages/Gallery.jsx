@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const Gallery = () => {
   const [trip, setTrip] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedTrip = localStorage.getItem("tripResult");
@@ -28,6 +31,14 @@ const Gallery = () => {
     <div className="min-h-screen bg-black text-white px-6 py-10">
       <div className="max-w-7xl mx-auto">
 
+        <button
+          onClick={() => navigate("/result")}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
+        >
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </button>
+
         <h1 className="text-4xl font-bold mb-2">
           📸 Destination Gallery
         </h1>
@@ -43,13 +54,13 @@ const Gallery = () => {
               key={index}
               className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 hover:scale-[1.02] transition duration-300"
             >
-              <img
-                src={`https://source.unsplash.com/600x400/?${encodeURIComponent(
-                  place
-                )}`}
-                alt={place}
-                className="w-full h-60 object-cover"
-              />
+              <div className="w-full h-60 bg-gradient-to-br from-cyan-900 to-blue-900 flex items-center justify-center">
+                <div className="text-center p-4">
+                  <div className="text-4xl mb-2">📸</div>
+                  <p className="text-cyan-300 font-semibold">{place}</p>
+                  <p className="text-cyan-500 text-sm mt-1">Destination View</p>
+                </div>
+              </div>
 
               <div className="p-5">
                 <h2 className="text-xl font-semibold">

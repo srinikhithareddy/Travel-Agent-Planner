@@ -57,6 +57,12 @@ const actions = [
 export default function QuickActions() {
   const navigate = useNavigate();
 
+  const handleNavigate = (path) => {
+    // Save current scroll position before navigating
+    sessionStorage.setItem("dashboardScroll", window.scrollY.toString());
+    navigate(path);
+  };
+
   return (
     <div className="mt-10">
 
@@ -72,7 +78,7 @@ export default function QuickActions() {
           return (
             <button
               key={item.title}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNavigate(item.path)}
               className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-cyan-500 hover:scale-105 transition duration-300"
             >
               <Icon

@@ -1,12 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const Assistant = () => {
   const [question, setQuestion] = useState("");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-10">
 
       <div className="max-w-5xl mx-auto">
+
+        <button
+          onClick={() => navigate("/result")}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition"
+        >
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </button>
 
         <h1 className="text-4xl font-bold mb-2">
           🤖 VoyageAI Assistant

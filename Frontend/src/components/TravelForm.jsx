@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -8,6 +8,7 @@ import {
   Users,
   CalendarDays,
 } from "lucide-react";
+import { generateTravelPlan } from "../services/api";
 
 export default function TravelForm() {
   const navigate = useNavigate();
@@ -25,6 +26,20 @@ export default function TravelForm() {
     preferences: "",
   });
 
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (e.target.type === "number") {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,28 +47,29 @@ export default function TravelForm() {
     });
   };
 
-    const handleSubmit = async () => {
-  if (
-    !formData.from ||
-    !formData.destination ||
-    !formData.startDate ||
-    !formData.endDate ||
-    !formData.budget ||
-    !formData.travelers
-  ) {
-    alert("Please fill all required fields.");
-    return;
-  }
+  const handleSubmit = async () => {
+    if (
+      !formData.from ||
+      !formData.destination ||
+      !formData.startDate ||
+      !formData.endDate ||
+      !formData.budget ||
+      !formData.travelers
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
 
-  try {
-    navigate("/loading");
+    try {
+      // Set flag to indicate we're generating a new trip
+      sessionStorage.setItem("generatingTrip", "true");
 
-    const response = await fetch("http://127.0.0.1:8000/generate-trip", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      // Clear any previous trip data
+      localStorage.removeItem("tripResult");
+
+      navigate("/loading");
+
+      const travelData = {
         from_city: formData.from,
         destination: formData.destination,
         start_date: formData.startDate,
@@ -64,45 +80,36 @@ export default function TravelForm() {
         accommodation: formData.accommodation,
         food_preference: formData.foodPreference,
         preferences: formData.preferences,
-      }),
-    });
+      };
 
-    console.log("Status:", response.status);
+      const result = await generateTravelPlan(travelData);
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+      console.log("Backend Response:", result);
+
+      const finalTrip = {
+        ...result,
+        from_city: formData.from,
+        destination: formData.destination,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        travelers: Number(formData.travelers),
+        total_budget: Number(formData.budget),
+        travel_style: formData.travelStyle,
+        accommodation: formData.accommodation,
+        food_preference: formData.foodPreference,
+      };
+
+      localStorage.setItem("tripResult", JSON.stringify(finalTrip));
+      console.log("Saved:", localStorage.getItem("tripResult"));
+
+      navigate("/result");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate trip: " + err.message);
+      localStorage.removeItem("tripResult");
+      navigate("/planner");
     }
-
-    const result = await response.json();
-
-    console.log("Backend Response:", result);
-
-    const finalTrip = {
-  ...result,
-
-  from_city: formData.from,
-  destination: formData.destination,
-
-  start_date: formData.startDate,
-  end_date: formData.endDate,
-
-  travelers: Number(formData.travelers),
-  total_budget: Number(formData.budget),
-
-  travel_style: formData.travelStyle,
-  accommodation: formData.accommodation,
-  food_preference: formData.foodPreference,
-};
-
-localStorage.setItem("tripResult", JSON.stringify(finalTrip));
-    console.log("Saved:", localStorage.getItem("tripResult"));
-
-    navigate("/result");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to generate trip.");
-  }
-};
+  };
 
   return (
     <Card className="bg-[#111111] border border-gray-800 rounded-3xl shadow-2xl">
@@ -197,7 +204,7 @@ localStorage.setItem("tripResult", JSON.stringify(finalTrip));
               placeholder="Budget"
               value={formData.budget}
               onChange={handleChange}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#1b1b1b] border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 outline-none"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#1b1b1b] border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 outline-none [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
 
@@ -214,7 +221,7 @@ localStorage.setItem("tripResult", JSON.stringify(finalTrip));
               placeholder="Number of Travelers"
               value={formData.travelers}
               onChange={handleChange}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#1b1b1b] border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 outline-none"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-[#1b1b1b] border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 outline-none [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
         </div>
@@ -236,6 +243,7 @@ localStorage.setItem("tripResult", JSON.stringify(finalTrip));
             <option>Luxury</option>
             <option>Family</option>
             <option>Solo</option>
+            <option>Friends</option>
             <option>Business</option>
             <option>Budget</option>
           </select>

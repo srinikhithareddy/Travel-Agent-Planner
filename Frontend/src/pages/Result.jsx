@@ -31,6 +31,26 @@ const Result = () => {
     if (storedTrip) {
       setTrip(JSON.parse(storedTrip));
     }
+
+    // Restore scroll position
+    const savedScroll = sessionStorage.getItem("dashboardScroll");
+    if (savedScroll) {
+      window.scrollTo(0, parseInt(savedScroll));
+      sessionStorage.removeItem("dashboardScroll");
+    }
+  }, []);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem("dashboardScroll", window.scrollY.toString());
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, []);
 
   const handleNewTrip = () => {
